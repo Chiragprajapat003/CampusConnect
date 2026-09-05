@@ -32,9 +32,17 @@ const userSchema = new mongoose.Schema(
       trim: true,
       default: "", // Optional: for the "Contact the reporter" feature
     },
+    avatarUrl: {
+      type: String,
+      default: "", // Path to student's uploaded profile photo
+    },
     isVerified: {
       type: Boolean,
       default: false,
+    },
+    pushTokens: {
+      type: [String],
+      default: [],
     },
   },
   {
