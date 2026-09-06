@@ -140,3 +140,28 @@ export const Storage = {
     }
   },
 };
+
+export const getStorageItem = async (key) => {
+  try {
+    if (Platform.OS === "web") {
+      return typeof localStorage !== "undefined" ? localStorage.getItem(key) : null;
+    }
+    return await SecureStore.getItemAsync(key);
+  } catch (error) {
+    return null;
+  }
+};
+
+export const setStorageItem = async (key, value) => {
+  try {
+    if (Platform.OS === "web") {
+      if (typeof localStorage !== "undefined") {
+        localStorage.setItem(key, value);
+      }
+    } else {
+      await SecureStore.setItemAsync(key, value);
+    }
+  } catch (error) {
+    console.error("Storage setItem Error:", error);
+  }
+};

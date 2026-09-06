@@ -565,12 +565,11 @@ const styles = StyleSheet.create({
     fontWeight: "600",
   },
   smartMatchContainer: {
-    backgroundColor: "#FEF3C7",
-    borderRadius: 18,
-    padding: 16,
-    borderWidth: 1,
-    borderColor: "#FDE68A",
-    marginBottom: 16,
+    backgroundColor: "#E0E7FF", // light indigo gradient proxy
+    borderRadius: 32, // heavily rounded
+    padding: 20,
+    borderWidth: 0,
+    marginBottom: 20,
   },
   smartMatchHeader: {
     flexDirection: "row",
@@ -594,11 +593,15 @@ const styles = StyleSheet.create({
   matchCard: {
     width: 170,
     backgroundColor: "#FFFFFF",
-    borderRadius: 14,
+    borderRadius: 24, // heavily rounded
     padding: 10,
-    marginRight: 10,
-    borderWidth: 1,
-    borderColor: "#FDE68A",
+    marginRight: 12,
+    borderWidth: 0,
+    shadowColor: "#4F46E5",
+    shadowOffset: { width: 0, height: 6 },
+    shadowOpacity: 0.1,
+    shadowRadius: 10,
+    elevation: 3,
   },
   matchImage: {
     width: "100%",
@@ -641,12 +644,13 @@ const styles = StyleSheet.create({
     borderTopWidth: 1,
   },
   actionButton: {
-    height: 50,
-    borderRadius: 14,
+    height: 56, // taller
+    borderRadius: 100, // pill
     flexDirection: "row",
     justifyContent: "center",
     alignItems: "center",
-    gap: 8,
+    gap: 10,
+    backgroundColor: "#0B1426", // dark navy
   },
   actionButtonText: {
     color: "#FFFFFF",

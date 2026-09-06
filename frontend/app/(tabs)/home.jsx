@@ -83,50 +83,51 @@ export default function HomeScreen() {
         </View>
 
         {/* Status Highlights */}
-        <Text style={[styles.sectionHeader, { color: colors.textPrimary }]}>Campus Hub</Text>
+        <Text style={styles.sectionHeader}>Campus Hub</Text>
+        
+        {/* Full width "Smart Match" style banner */}
+        <TouchableOpacity
+          style={[styles.actionCard, { width: "100%", backgroundColor: "#4F46E5" }]}
+          onPress={() => router.push("/(tabs)/lost-found")}
+          activeOpacity={0.8}
+        >
+          <View style={styles.actionIconBg}>
+            <Ionicons name="search" size={24} color="#FFF" />
+          </View>
+          <Text style={styles.actionTitle}>Lost & Found Feed</Text>
+          <Text style={styles.actionSubtitle}>
+            Browse all reported items or search for missing belongings
+          </Text>
+        </TouchableOpacity>
+
         <View style={styles.quickActionGrid}>
-          {/* Lost & Found Card */}
+          {/* Campus Events Card - Vibrant Orange */}
           <TouchableOpacity
-            style={[styles.actionCard, { backgroundColor: colors.card, borderColor: colors.border }]}
-            onPress={() => router.push("/(tabs)/lost-found")}
-            activeOpacity={0.75}
-          >
-            <View style={[styles.actionIconBg, { backgroundColor: colors.lostBg }]}>
-              <Ionicons name="search" size={24} color={colors.lostText} />
-            </View>
-            <Text style={[styles.actionTitle, { color: colors.textPrimary }]}>Lost & Found Feed</Text>
-            <Text style={[styles.actionSubtitle, { color: colors.textSecondary }]}>
-              Browse all reported items or search for missing belongings
-            </Text>
-          </TouchableOpacity>
-
-          {/* Campus Events Card */}
-          <TouchableOpacity
-            style={[styles.actionCard, { backgroundColor: colors.card, borderColor: colors.border }]}
+            style={[styles.actionCard, { backgroundColor: "#F97316" }]}
             onPress={() => router.push("/(tabs)/events")}
-            activeOpacity={0.75}
+            activeOpacity={0.8}
           >
-            <View style={[styles.actionIconBg, { backgroundColor: colors.primaryLight }]}>
-              <Ionicons name="calendar" size={24} color={colors.primary} />
+            <View style={styles.actionIconBg}>
+              <Ionicons name="calendar" size={24} color="#FFF" />
             </View>
-            <Text style={[styles.actionTitle, { color: colors.textPrimary }]}>Campus Event Board</Text>
-            <Text style={[styles.actionSubtitle, { color: colors.textSecondary }]}>
-              Discover workshops, hackathons & RSVP with live attendee counts
+            <Text style={styles.actionTitle}>Events</Text>
+            <Text style={styles.actionSubtitle}>
+              Live campus sessions
             </Text>
           </TouchableOpacity>
 
-          {/* Report New Item Card */}
+          {/* Report New Item Card - Vibrant Pink */}
           <TouchableOpacity
-            style={[styles.actionCard, { backgroundColor: colors.card, borderColor: colors.border }]}
+            style={[styles.actionCard, { backgroundColor: "#EC4899" }]}
             onPress={() => router.push("/(tabs)/report")}
-            activeOpacity={0.75}
+            activeOpacity={0.8}
           >
-            <View style={[styles.actionIconBg, { backgroundColor: colors.foundBg }]}>
-              <Ionicons name="add-circle" size={24} color={colors.foundText} />
+            <View style={styles.actionIconBg}>
+              <Ionicons name="add-circle" size={24} color="#FFF" />
             </View>
-            <Text style={[styles.actionTitle, { color: colors.textPrimary }]}>Report Lost or Found Item</Text>
-            <Text style={[styles.actionSubtitle, { color: colors.textSecondary }]}>
-              Take a photo, tag GPS location, and publish a report
+            <Text style={styles.actionTitle}>Report Item</Text>
+            <Text style={styles.actionSubtitle}>
+              Found or lost something?
             </Text>
           </TouchableOpacity>
         </View>
@@ -261,40 +262,50 @@ const styles = StyleSheet.create({
     color: COLORS.foundText,
   },
   sectionHeader: {
-    fontSize: 18,
-    fontWeight: "700",
-    color: COLORS.textPrimary,
-    marginBottom: 14,
+    fontSize: 20,
+    fontWeight: "800",
+    color: "#0F172A",
+    marginBottom: 16,
+    letterSpacing: -0.5,
   },
   quickActionGrid: {
-    gap: 14,
-    marginBottom: 28,
+    gap: 16,
+    marginBottom: 32,
+    flexDirection: "row",
+    flexWrap: "wrap",
+    justifyContent: "space-between",
   },
   actionCard: {
-    backgroundColor: COLORS.card,
-    borderRadius: 18,
-    padding: 18,
-    borderWidth: 1,
-    borderColor: COLORS.border,
+    borderRadius: 24, // heavily rounded
+    padding: 20,
+    width: "48%", // Fit two in a row for the smaller ones
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 8 },
+    shadowOpacity: 0.1,
+    shadowRadius: 16,
+    elevation: 4,
+    marginBottom: 16,
   },
   actionIconBg: {
-    width: 48,
-    height: 48,
-    borderRadius: 14,
+    width: 44,
+    height: 44,
+    borderRadius: 22, // circular
     justifyContent: "center",
     alignItems: "center",
-    marginBottom: 12,
+    marginBottom: 14,
+    backgroundColor: "rgba(255,255,255,0.2)",
   },
   actionTitle: {
     fontSize: 16,
-    fontWeight: "700",
-    color: COLORS.textPrimary,
-    marginBottom: 4,
+    fontWeight: "800",
+    color: "#FFFFFF",
+    marginBottom: 6,
+    letterSpacing: -0.3,
   },
   actionSubtitle: {
-    fontSize: 13,
-    color: COLORS.textSecondary,
-    lineHeight: 18,
+    fontSize: 12,
+    color: "rgba(255,255,255,0.8)",
+    lineHeight: 16,
   },
   logoutButton: {
     flexDirection: "row",

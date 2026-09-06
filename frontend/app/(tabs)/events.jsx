@@ -950,11 +950,12 @@ const styles = StyleSheet.create({
     gap: 6,
   },
   segmentTabActive: {
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 2,
+    shadowColor: "#4F46E5",
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.2,
+    shadowRadius: 8,
+    elevation: 4,
+    backgroundColor: "#0B1426", // Dark pill for active state
   },
   segmentTabText: {
     fontSize: 13,
@@ -963,12 +964,18 @@ const styles = StyleSheet.create({
   searchBar: {
     flexDirection: "row",
     alignItems: "center",
-    borderRadius: 14,
-    paddingHorizontal: 14,
-    height: 44,
-    borderWidth: 1,
-    marginBottom: 12,
-    gap: 8,
+    borderRadius: 100, // Pill shape
+    paddingHorizontal: 18,
+    height: 52,
+    borderWidth: 0,
+    backgroundColor: "#FFFFFF",
+    shadowColor: "#0F172A",
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.05,
+    shadowRadius: 8,
+    elevation: 3,
+    marginBottom: 16,
+    gap: 12,
   },
   searchInput: {
     flex: 1,
@@ -993,14 +1000,16 @@ const styles = StyleSheet.create({
     gap: 16,
   },
   card: {
-    borderRadius: 20,
+    borderRadius: 24, // Matches screenshot
     overflow: "hidden",
-    borderWidth: 1,
-    shadowColor: "#0F172A",
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.04,
-    shadowRadius: 10,
-    elevation: 2,
+    borderWidth: 0,
+    backgroundColor: "#FFFFFF",
+    shadowColor: "#4F46E5",
+    shadowOffset: { width: 0, height: 10 },
+    shadowOpacity: 0.08,
+    shadowRadius: 20,
+    elevation: 5,
+    marginBottom: 8,
   },
   bannerImage: {
     width: "100%",
@@ -1092,15 +1101,16 @@ const styles = StyleSheet.create({
   rsvpButton: {
     flexDirection: "row",
     alignItems: "center",
-    paddingHorizontal: 14,
-    paddingVertical: 8,
-    borderRadius: 12,
-    gap: 6,
+    paddingHorizontal: 20,
+    paddingVertical: 10,
+    borderRadius: 100, // Pill shape
+    gap: 8,
+    backgroundColor: "#0B1426", // Dark navy default
   },
   rsvpButtonText: {
     color: "#FFFFFF",
-    fontSize: 13,
-    fontWeight: "700",
+    fontSize: 14,
+    fontWeight: "800",
   },
   pollCard: {
     borderRadius: 20,
