@@ -42,8 +42,8 @@ function NavigationGuard() {
     const inAuthGroup = segments[0] === "(auth)";
 
     if (!isAuthenticated && !inAuthGroup) {
-      // If user is not logged in and not on a login/register screen, redirect to login
-      router.replace("/(auth)/login");
+      // If user is not logged in and not on a login/register/onboarding screen, redirect to onboarding
+      router.replace("/(auth)/onboarding");
     } else if (isAuthenticated && inAuthGroup) {
       // If user is logged in but still on login/register screen, redirect to main tabs
       router.replace("/(tabs)/home");
