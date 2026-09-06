@@ -10,137 +10,165 @@ import {
 import { useRouter } from "expo-router";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { Ionicons } from "@expo/vector-icons";
+import * as Animatable from "react-native-animatable";
+import { LinearGradient } from "expo-linear-gradient";
 import { useAuth } from "../../context/AuthContext";
 import { useTheme } from "../../context/ThemeContext";
 import { useNotifications } from "../../context/NotificationContext";
 import { COLORS, API_BASE_URL } from "../../lib/config";
 import NotificationModal from "../../components/NotificationModal";
 
-/**
- * Home Screen (Starter Dashboard matching Stitch Design)
- * 
- * WHAT IT DOES:
- * Welcomes the authenticated student, displays their verified college badge,
- * student avatar, real-time campus activity notifications, and quick action cards.
- */
 export default function HomeScreen() {
   const router = useRouter();
   const { user, logout } = useAuth();
   const { colors } = useTheme();
-  const { hasUnread } = useNotifications();
   const insets = useSafeAreaInsets();
+  const { notifications } = useNotifications();
   const [isNotifOpen, setIsNotifOpen] = useState(false);
 
-  const imageHostUrl = API_BASE_URL.replace(/\/api$/, "");
-  const avatarFullUrl = user?.avatarUrl ? `${imageHostUrl}${user.avatarUrl}` : null;
+  const hasUnread = notifications.some((n) => !n.read);
+
+  // Construct full avatar URL if necessary
+  const avatarFullUrl =
+    user?.avatar && user.avatar.startsWith("/uploads/")
+      ? `${API_BASE_URL.replace("/api", "")}${user.avatar}`
+      : user?.avatar;
 
   return (
-    <View style={[styles.safeArea, { backgroundColor: colors.background, paddingTop: insets.top, paddingBottom: insets.bottom }]}>
+    <View style={[styles.safeArea, { backgroundColor: colors.background, paddingTop: insets.top }]}>
       <ScrollView
-        contentContainerStyle={styles.container}
+        contentContainerStyle={[styles.scrollContent, { paddingBottom: insets.bottom + 100 }]}
         showsVerticalScrollIndicator={false}
       >
         {/* Top App Bar */}
-        <View style={styles.topBar}>
+        <Animatable.View animation="fadeInDown" duration={800} style={styles.topBar}>
           <View>
             <Text style={[styles.greeting, { color: colors.textSecondary }]}>Welcome back,</Text>
-            <Text style={[styles.userName, { color: colors.textPrimary }]}>{user?.name || "Student"} 👋</Text>
+            <Text style={[styles.userName, { color: colors.primary }]}>{user?.name || "Student"} 👋</Text>
           </View>
           <View style={{ flexDirection: "row", gap: 10, alignItems: "center" }}>
             <TouchableOpacity
-              style={[styles.notifIconButton, { backgroundColor: colors.primaryLight }]}
+              style={[styles.iconButton, { backgroundColor: colors.card }]}
               onPress={() => setIsNotifOpen(true)}
-              activeOpacity={0.75}
             >
-              <Ionicons name="notifications-outline" size={22} color={colors.primary} />
+              <Ionicons name="notifications-outline" size={22} color={colors.textPrimary} />
               {hasUnread && <View style={[styles.badgeDot, { backgroundColor: colors.error }]} />}
             </TouchableOpacity>
           </View>
-        </View>
+        </Animatable.View>
 
         <NotificationModal visible={isNotifOpen} onClose={() => setIsNotifOpen(false)} />
 
         {/* User College Card */}
-        <View style={[styles.profileCard, { backgroundColor: colors.card, borderColor: colors.border }]}>
+        <Animatable.View animation="fadeIn" delay={300} duration={800} style={[styles.profileCard, { backgroundColor: colors.card, borderColor: colors.border }]}>
           {avatarFullUrl ? (
             <Image source={{ uri: avatarFullUrl }} style={styles.avatarPhoto} />
           ) : (
-            <View style={[styles.avatar, { backgroundColor: colors.primary }]}>
-              <Text style={styles.avatarText}>
-                {user?.name ? user.name.charAt(0).toUpperCase() : "U"}
+            <View style={[styles.avatarPlaceholder, { backgroundColor: colors.primaryLight }]}>
+              <Text style={[styles.avatarPlaceholderText, { color: colors.primary }]}>
+                {user?.name?.charAt(0)?.toUpperCase() || "S"}
               </Text>
             </View>
           )}
           <View style={styles.profileInfo}>
-            <Text style={[styles.profileEmail, { color: colors.textPrimary }]}>{user?.email}</Text>
-            <View style={styles.badgeRow}>
-              <View style={[styles.verifiedBadge, { backgroundColor: colors.foundBg }]}>
-                <Ionicons name="checkmark-circle" size={14} color={colors.foundText} />
-                <Text style={[styles.verifiedText, { color: colors.foundText }]}>Verified Student</Text>
-              </View>
+            <Text style={[styles.profileEmail, { color: colors.textPrimary }]} numberOfLines={1}>
+              {user?.email}
+            </Text>
+            <View style={styles.verifiedBadge}>
+              <Ionicons name="checkmark-circle" size={14} color={colors.success} />
+              <Text style={[styles.verifiedText, { color: colors.success }]}>Verified Student</Text>
             </View>
           </View>
-        </View>
+        </Animatable.View>
 
         {/* Status Highlights */}
-        <Text style={styles.sectionHeader}>Campus Hub</Text>
+        <Animatable.Text animation="fadeInUp" delay={400} style={styles.sectionHeader}>Campus Hub</Animatable.Text>
         
         {/* Full width "Smart Match" style banner */}
-        <TouchableOpacity
-          style={[styles.actionCard, { width: "100%", backgroundColor: "#4F46E5" }]}
-          onPress={() => router.push("/(tabs)/lost-found")}
-          activeOpacity={0.8}
-        >
-          <View style={styles.actionIconBg}>
-            <Ionicons name="search" size={24} color="#FFF" />
-          </View>
-          <Text style={styles.actionTitle}>Lost & Found Feed</Text>
-          <Text style={styles.actionSubtitle}>
-            Browse all reported items or search for missing belongings
-          </Text>
-        </TouchableOpacity>
+        <Animatable.View animation="fadeInUp" delay={500} style={{ width: "100%", marginBottom: 16 }}>
+          <TouchableOpacity
+            style={styles.actionCardContainer}
+            onPress={() => router.push("/(tabs)/lost-found")}
+            activeOpacity={0.85}
+          >
+            <LinearGradient
+              colors={["#8B5CF6", "#6366F1"]}
+              start={{ x: 0, y: 0 }}
+              end={{ x: 1, y: 1 }}
+              style={styles.actionCardGradient}
+            >
+              <View style={styles.actionIconBg}>
+                <Ionicons name="search" size={24} color="#FFF" />
+              </View>
+              <Text style={styles.actionTitle}>Lost & Found Feed</Text>
+              <Text style={styles.actionSubtitle}>
+                Browse all reported items or search for missing belongings
+              </Text>
+            </LinearGradient>
+          </TouchableOpacity>
+        </Animatable.View>
 
         <View style={styles.quickActionGrid}>
           {/* Campus Events Card - Vibrant Orange */}
-          <TouchableOpacity
-            style={[styles.actionCard, { backgroundColor: "#F97316" }]}
-            onPress={() => router.push("/(tabs)/events")}
-            activeOpacity={0.8}
-          >
-            <View style={styles.actionIconBg}>
-              <Ionicons name="calendar" size={24} color="#FFF" />
-            </View>
-            <Text style={styles.actionTitle}>Events</Text>
-            <Text style={styles.actionSubtitle}>
-              Live campus sessions
-            </Text>
-          </TouchableOpacity>
+          <Animatable.View animation="fadeInUp" delay={600} style={styles.gridCardWrapper}>
+            <TouchableOpacity
+              style={styles.actionCardContainer}
+              onPress={() => router.push("/(tabs)/events")}
+              activeOpacity={0.85}
+            >
+              <LinearGradient
+                colors={["#F97316", "#F59E0B"]}
+                start={{ x: 0, y: 0 }}
+                end={{ x: 1, y: 1 }}
+                style={styles.actionCardGradient}
+              >
+                <View style={styles.actionIconBg}>
+                  <Ionicons name="calendar" size={24} color="#FFF" />
+                </View>
+                <Text style={styles.actionTitle}>Events</Text>
+                <Text style={styles.actionSubtitle}>
+                  Live campus sessions
+                </Text>
+              </LinearGradient>
+            </TouchableOpacity>
+          </Animatable.View>
 
           {/* Report New Item Card - Vibrant Pink */}
-          <TouchableOpacity
-            style={[styles.actionCard, { backgroundColor: "#EC4899" }]}
-            onPress={() => router.push("/(tabs)/report")}
-            activeOpacity={0.8}
-          >
-            <View style={styles.actionIconBg}>
-              <Ionicons name="add-circle" size={24} color="#FFF" />
-            </View>
-            <Text style={styles.actionTitle}>Report Item</Text>
-            <Text style={styles.actionSubtitle}>
-              Found or lost something?
-            </Text>
-          </TouchableOpacity>
+          <Animatable.View animation="fadeInUp" delay={700} style={styles.gridCardWrapper}>
+            <TouchableOpacity
+              style={styles.actionCardContainer}
+              onPress={() => router.push("/(tabs)/report")}
+              activeOpacity={0.85}
+            >
+              <LinearGradient
+                colors={["#EC4899", "#E11D48"]}
+                start={{ x: 0, y: 0 }}
+                end={{ x: 1, y: 1 }}
+                style={styles.actionCardGradient}
+              >
+                <View style={styles.actionIconBg}>
+                  <Ionicons name="add-circle" size={24} color="#FFF" />
+                </View>
+                <Text style={styles.actionTitle}>Report Item</Text>
+                <Text style={styles.actionSubtitle}>
+                  Found or lost something?
+                </Text>
+              </LinearGradient>
+            </TouchableOpacity>
+          </Animatable.View>
         </View>
 
         {/* Logout Action Button */}
-        <TouchableOpacity
-          style={[styles.logoutButton, { backgroundColor: colors.card, borderColor: colors.errorBg }]}
-          onPress={logout}
-          activeOpacity={0.8}
-        >
-          <Ionicons name="log-out-outline" size={18} color={colors.error} />
-          <Text style={[styles.logoutButtonText, { color: colors.error }]}>Sign Out of CampusConnect</Text>
-        </TouchableOpacity>
+        <Animatable.View animation="fadeIn" delay={900}>
+          <TouchableOpacity
+            style={[styles.logoutButton, { backgroundColor: colors.card, borderColor: colors.errorBg }]}
+            onPress={logout}
+            activeOpacity={0.8}
+          >
+            <Ionicons name="log-out-outline" size={18} color={colors.error} />
+            <Text style={[styles.logoutButtonText, { color: colors.error }]}>Sign Out of CampusConnect</Text>
+          </TouchableOpacity>
+        </Animatable.View>
       </ScrollView>
     </View>
   );
@@ -149,178 +177,152 @@ export default function HomeScreen() {
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
-    backgroundColor: COLORS.background,
   },
-  container: {
+  scrollContent: {
     paddingHorizontal: 20,
     paddingTop: 16,
-    paddingBottom: 32,
   },
   topBar: {
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
-    marginBottom: 20,
+    marginBottom: 24,
   },
   greeting: {
     fontSize: 14,
-    color: COLORS.textSecondary,
-    fontWeight: "500",
+    fontWeight: "600",
   },
   userName: {
     fontSize: 24,
     fontWeight: "800",
-    color: COLORS.textPrimary,
     letterSpacing: -0.5,
   },
-  logoutIconButton: {
-    width: 40,
-    height: 40,
-    borderRadius: 12,
-    backgroundColor: COLORS.errorBg,
+  iconButton: {
+    width: 44,
+    height: 44,
+    borderRadius: 22,
     justifyContent: "center",
     alignItems: "center",
-  },
-  notifIconButton: {
-    width: 42,
-    height: 42,
-    borderRadius: 12,
-    justifyContent: "center",
-    alignItems: "center",
-    position: "relative",
   },
   badgeDot: {
     position: "absolute",
-    top: 8,
-    right: 8,
-    width: 9,
-    height: 9,
-    borderRadius: 4.5,
-    backgroundColor: COLORS.error,
-    borderWidth: 1.5,
-    borderColor: "#FFFFFF",
+    top: 10,
+    right: 12,
+    width: 8,
+    height: 8,
+    borderRadius: 4,
   },
   profileCard: {
-    backgroundColor: COLORS.card,
-    borderRadius: 20,
-    padding: 18,
     flexDirection: "row",
     alignItems: "center",
+    padding: 16,
+    borderRadius: 20,
     borderWidth: 1,
-    borderColor: COLORS.border,
-    shadowColor: "#0F172A",
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.04,
-    shadowRadius: 10,
-    elevation: 2,
-    marginBottom: 24,
+    marginBottom: 28,
   },
   avatarPhoto: {
-    width: 52,
-    height: 52,
-    borderRadius: 26,
-    marginRight: 14,
+    width: 56,
+    height: 56,
+    borderRadius: 28,
+    marginRight: 16,
   },
-  avatar: {
-    width: 52,
-    height: 52,
-    borderRadius: 26,
-    backgroundColor: COLORS.primary,
+  avatarPlaceholder: {
+    width: 56,
+    height: 56,
+    borderRadius: 28,
+    marginRight: 16,
     justifyContent: "center",
     alignItems: "center",
-    marginRight: 14,
   },
-  avatarText: {
-    color: "#FFFFFF",
-    fontSize: 22,
+  avatarPlaceholderText: {
+    fontSize: 24,
     fontWeight: "700",
   },
   profileInfo: {
     flex: 1,
   },
   profileEmail: {
-    fontSize: 15,
-    fontWeight: "600",
-    color: COLORS.textPrimary,
+    fontSize: 16,
+    fontWeight: "700",
     marginBottom: 4,
-  },
-  badgeRow: {
-    flexDirection: "row",
   },
   verifiedBadge: {
     flexDirection: "row",
     alignItems: "center",
-    backgroundColor: COLORS.foundBg,
+    backgroundColor: "rgba(16, 185, 129, 0.1)", // Light green bg
     paddingHorizontal: 8,
-    paddingVertical: 3,
+    paddingVertical: 4,
     borderRadius: 8,
-    gap: 4,
+    alignSelf: "flex-start",
   },
   verifiedText: {
     fontSize: 12,
-    fontWeight: "600",
-    color: COLORS.foundText,
+    fontWeight: "700",
+    marginLeft: 4,
   },
   sectionHeader: {
-    fontSize: 20,
+    fontSize: 18,
     fontWeight: "800",
-    color: "#0F172A",
     marginBottom: 16,
-    letterSpacing: -0.5,
+    color: "#0F172A",
   },
   quickActionGrid: {
-    gap: 16,
-    marginBottom: 32,
     flexDirection: "row",
     flexWrap: "wrap",
     justifyContent: "space-between",
   },
-  actionCard: {
-    borderRadius: 24, // heavily rounded
-    padding: 20,
-    width: "48%", // Fit two in a row for the smaller ones
+  actionCardContainer: {
+    width: "100%",
+    borderRadius: 24,
     shadowColor: "#000",
-    shadowOffset: { width: 0, height: 8 },
-    shadowOpacity: 0.1,
-    shadowRadius: 16,
-    elevation: 4,
+    shadowOffset: { width: 0, height: 12 },
+    shadowOpacity: 0.15,
+    shadowRadius: 20,
+    elevation: 8,
+    overflow: "hidden", // Keep gradient inside rounded corners
     marginBottom: 16,
+  },
+  actionCardGradient: {
+    padding: 24,
+    width: "100%",
+    minHeight: 140, // Ensures the card has a nice size without exploding
+    justifyContent: "space-between",
+  },
+  gridCardWrapper: {
+    width: "48%",
   },
   actionIconBg: {
     width: 44,
     height: 44,
-    borderRadius: 22, // circular
+    borderRadius: 22,
+    backgroundColor: "rgba(255,255,255,0.2)",
     justifyContent: "center",
     alignItems: "center",
-    marginBottom: 14,
-    backgroundColor: "rgba(255,255,255,0.2)",
+    marginBottom: 12,
   },
   actionTitle: {
-    fontSize: 16,
+    fontSize: 18,
     fontWeight: "800",
     color: "#FFFFFF",
-    marginBottom: 6,
-    letterSpacing: -0.3,
+    marginBottom: 4,
   },
   actionSubtitle: {
     fontSize: 12,
     color: "rgba(255,255,255,0.8)",
-    lineHeight: 16,
+    fontWeight: "500",
   },
   logoutButton: {
     flexDirection: "row",
-    justifyContent: "center",
     alignItems: "center",
-    backgroundColor: COLORS.card,
+    justifyContent: "center",
+    padding: 16,
+    borderRadius: 16,
     borderWidth: 1,
-    borderColor: COLORS.errorBg,
-    paddingVertical: 14,
-    borderRadius: 14,
+    marginTop: 16,
     gap: 8,
   },
   logoutButtonText: {
-    color: COLORS.error,
     fontSize: 15,
-    fontWeight: "600",
+    fontWeight: "700",
   },
 });

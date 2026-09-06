@@ -48,33 +48,38 @@ export const API_BASE_URL = Platform.select({
  * Stitch UI Light Theme Palette
  */
 export const LIGHT_THEME = {
-  // Brand Primaries
-  primary: "#4F46E5",       // Deep Indigo
-  primaryDark: "#4338CA",   // Dark Indigo (active/pressed states)
-  primaryLight: "#EEF2FF",  // Indigo Tint (backgrounds, badges)
+  // Brand Primaries (Vibrant Gen-Z Palette)
+  primary: "#8B5CF6",       // Electric Violet
+  primaryDark: "#7C3AED",   // Deep Violet (active/pressed states)
+  primaryLight: "#EDE9FE",  // Violet Tint (backgrounds, badges)
+  
+  // Secondary / Accent Colors
+  accentPink: "#EC4899",
+  accentOrange: "#F97316",
+  accentTeal: "#14B8A6",
   
   // Neutral Canvas & Text
   background: "#F8FAFC",    // Slate-50 background
   card: "#FFFFFF",          // Pure White card
   textPrimary: "#0F172A",   // Slate-900 high contrast text
-  textSecondary: "#64748B", // Slate-500 secondary text
+  textSecondary: "#475569", // Slate-600 secondary text
   textMuted: "#94A3B8",     // Slate-400 placeholder text
   border: "#E2E8F0",        // Slate-200 border lines
-  borderFocus: "#6366F1",   // Indigo focus ring
+  borderFocus: "#8B5CF6",   // Violet focus ring
   
   // Status Pills (Lost, Found, Resolved)
-  lostText: "#DC2626",      // Red-600
-  lostBg: "#FEE2E2",        // Red-100
-  foundText: "#059669",     // Emerald-600
-  foundBg: "#D1FAE5",       // Emerald-100
-  resolvedText: "#7C3AED",  // Purple-600
-  resolvedBg: "#EDE9FE",    // Purple-100
+  lostText: "#E11D48",      // Rose-600
+  lostBg: "#FFE4E6",        // Rose-100
+  foundText: "#0D9488",     // Teal-600
+  foundBg: "#CCFBF1",       // Teal-100
+  resolvedText: "#7C3AED",  // Violet-600
+  resolvedBg: "#EDE9FE",    // Violet-100
   
   // UI Alerts
-  error: "#EF4444",
-  errorBg: "#FEF2F2",
+  error: "#F43F5E",
+  errorBg: "#FFE4E6",
   success: "#10B981",
-  successBg: "#ECFDF5",
+  successBg: "#D1FAE5",
 };
 
 /**
