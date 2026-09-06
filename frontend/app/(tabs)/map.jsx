@@ -17,12 +17,12 @@ import * as Location from "expo-location";
 import { api } from "../../lib/api";
 import { API_BASE_URL, COLORS } from "../../lib/config";
 
-// Default fallback coordinates (Central Campus)
+// Exact Center coordinates of Swaminarayan University, Kalol provided by the user
 const DEFAULT_REGION = {
-  latitude: 28.6139,
-  longitude: 77.2090,
-  latitudeDelta: 0.05,
-  longitudeDelta: 0.05,
+  latitude: 23.2230998,
+  longitude: 72.5054761,
+  latitudeDelta: 0.005, // Much tighter zoom
+  longitudeDelta: 0.005,
 };
 
 /**
@@ -47,6 +47,8 @@ export default function CampusMapScreen() {
   const [filterType, setFilterType] = useState("all"); // 'all', 'lost', 'found', 'events'
   const [userLocation, setUserLocation] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [is3DMode, setIs3DMode] = useState(false); // Track if map is in 3D perspective
+  const [mapType, setMapType] = useState("standard"); // Toggle satellite/standard
 
   const imageHostUrl = API_BASE_URL.replace(/\/api$/, "");
 
@@ -61,13 +63,26 @@ export default function CampusMapScreen() {
         const coords = {
           latitude: location.coords.latitude,
           longitude: location.coords.longitude,
-          latitudeDelta: 0.02,
-          longitudeDelta: 0.02,
+          latitudeDelta: 0.005,
+          longitudeDelta: 0.005,
         };
         setUserLocation(coords);
 
+        // Calculate distance to campus to see if they are actually on/near campus
+        const latDiff = Math.abs(coords.latitude - DEFAULT_REGION.latitude);
+        const lonDiff = Math.abs(coords.longitude - DEFAULT_REGION.longitude);
+        
         if (mapRef.current) {
-          mapRef.current.animateToRegion(coords, 1000);
+          // If the user is very far away from the campus (e.g. testing from home), 
+          // don't fly the camera away from the campus! Always show the campus by default.
+          const isNearCampus = latDiff < 0.05 && lonDiff < 0.05;
+          
+          mapRef.current.animateCamera({
+            center: isNearCampus ? coords : DEFAULT_REGION,
+            pitch: is3DMode ? 65 : 0,
+            heading: 0,
+            altitude: is3DMode ? 400 : 1000, // Zoom in closer for the exact campus view
+          }, { duration: 1000 });
         }
       }
     } catch (error) {
@@ -108,12 +123,39 @@ export default function CampusMapScreen() {
   }, [getUserLocation, fetchMapData]);
 
   // Recenter button action
-  const handleRecenter = () => {
-    if (userLocation && mapRef.current) {
-      mapRef.current.animateToRegion(userLocation, 800);
-    } else {
-      getUserLocation();
+  const handleRecenter = async () => {
+    let target = userLocation || DEFAULT_REGION;
+    if (!userLocation) {
+       await getUserLocation();
+       // getUserLocation updates the state and animates itself, so we can return early
+       return; 
     }
+    
+    if (mapRef.current) {
+      mapRef.current.animateCamera({
+        center: target,
+        pitch: is3DMode ? 65 : 0,
+        heading: 0,
+        altitude: is3DMode ? 800 : 2000,
+      }, { duration: 800 });
+    }
+  };
+
+  // Toggle 3D visual map
+  const toggle3DMode = () => {
+    const new3DState = !is3DMode;
+    setIs3DMode(new3DState);
+    if (mapRef.current) {
+      mapRef.current.animateCamera({
+        pitch: new3DState ? 65 : 0,
+        altitude: new3DState ? 800 : 2000,
+      }, { duration: 1200 });
+    }
+  };
+
+  // Toggle Map Type (Satellite / Standard)
+  const toggleMapType = () => {
+    setMapType(prev => (prev === "standard" ? "satellite" : "standard"));
   };
 
   // Filter markers based on selected chip
@@ -136,6 +178,10 @@ export default function CampusMapScreen() {
         showsUserLocation={true}
         showsMyLocationButton={false}
         showsCompass={true}
+        showsBuildings={true} // ENABLES 3D BUILDINGS
+        pitchEnabled={true}
+        mapType={mapType} // Controlled by state
+        minZoomLevel={15.5} // Prevents user from zooming out to the whole city!
       >
         {/* Render Lost & Found Pins */}
         {displayedItems.map((item) => {
@@ -151,6 +197,19 @@ export default function CampusMapScreen() {
                 longitude: item.location.longitude,
               }}
               pinColor={pinColor}
+              onPress={() => {
+                if (mapRef.current) {
+                  mapRef.current.animateCamera({
+                    center: {
+                      latitude: item.location.latitude,
+                      longitude: item.location.longitude,
+                    },
+                    pitch: is3DMode ? 65 : 0,
+                    heading: 0,
+                    altitude: is3DMode ? 200 : 400, // Zoom in super close to the tapped pin!
+                  }, { duration: 800 });
+                }
+              }}
             >
               {/* Custom Pin Callout */}
               <Callout
@@ -237,8 +296,30 @@ export default function CampusMapScreen() {
 
       {/* Floating Recenter & Refresh Controls */}
       <View style={styles.fabContainer}>
+        {/* Toggle Map Type Button */}
         <TouchableOpacity
           style={styles.fabButton}
+          onPress={toggleMapType}
+          activeOpacity={0.85}
+        >
+          <Ionicons 
+            name={mapType === "standard" ? "earth" : "map"} 
+            size={22} 
+            color={COLORS.primary} 
+          />
+        </TouchableOpacity>
+
+        {/* Toggle 3D Button */}
+        <TouchableOpacity
+          style={[styles.fabButton, { marginTop: 10 }, is3DMode && styles.fabButtonActive]}
+          onPress={toggle3DMode}
+          activeOpacity={0.85}
+        >
+          <Ionicons name="cube" size={22} color={is3DMode ? "#FFFFFF" : COLORS.primary} />
+        </TouchableOpacity>
+
+        <TouchableOpacity
+          style={[styles.fabButton, { marginTop: 10 }]}
           onPress={handleRecenter}
           activeOpacity={0.85}
         >
@@ -329,6 +410,10 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.12,
     shadowRadius: 8,
     elevation: 4,
+  },
+  fabButtonActive: {
+    backgroundColor: COLORS.primary,
+    borderColor: COLORS.primary,
   },
   calloutCard: {
     width: 200,
