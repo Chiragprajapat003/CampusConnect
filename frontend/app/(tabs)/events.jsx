@@ -18,6 +18,7 @@ import {
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { Ionicons } from "@expo/vector-icons";
 import * as ImagePicker from "expo-image-picker";
+import * as Animatable from "react-native-animatable";
 import { api } from "../../lib/api";
 import { useAuth } from "../../context/AuthContext";
 import { useTheme } from "../../context/ThemeContext";
@@ -194,7 +195,7 @@ export default function EventsScreen() {
   // 4. Image Picker for Event Banner
   const handlePickEventImage = async () => {
     const result = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      mediaTypes: ['images'],
       allowsEditing: true,
       aspect: [16, 9],
       quality: 0.8,
@@ -322,7 +323,7 @@ export default function EventsScreen() {
     });
 
     return (
-      <View style={[styles.card, { backgroundColor: colors.card, borderColor: colors.border }]}>
+      <Animatable.View animation="fadeInUp" duration={600} style={[styles.card, { backgroundColor: colors.card, borderColor: colors.border }]}>
         {imageUrl ? (
           <Image source={{ uri: imageUrl }} style={styles.bannerImage} resizeMode="cover" />
         ) : (
@@ -389,7 +390,7 @@ export default function EventsScreen() {
             </TouchableOpacity>
           </View>
         </View>
-      </View>
+      </Animatable.View>
     );
   };
 
@@ -401,7 +402,7 @@ export default function EventsScreen() {
     );
 
     return (
-      <View style={[styles.pollCard, { backgroundColor: colors.card, borderColor: colors.border }]}>
+      <Animatable.View animation="fadeInUp" duration={600} style={[styles.pollCard, { backgroundColor: colors.card, borderColor: colors.border }]}>
         <View style={styles.pollHeaderRow}>
           <View style={[styles.pollCategoryBadge, { backgroundColor: colors.primaryLight }]}>
             <Text style={[styles.pollCategoryText, { color: colors.primary }]}>{poll.category || "General"}</Text>
@@ -469,7 +470,7 @@ export default function EventsScreen() {
             );
           })}
         </View>
-      </View>
+      </Animatable.View>
     );
   };
 
