@@ -11,10 +11,12 @@ import {
   Alert,
   KeyboardAvoidingView,
   Platform,
+  Modal,
 } from "react-native";
 import { useRouter } from "expo-router";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { Ionicons } from "@expo/vector-icons";
+import MapView, { Marker } from "react-native-maps";
 import * as ImagePicker from "expo-image-picker";
 import * as Location from "expo-location";
 import { api } from "../../lib/api";
@@ -62,6 +64,17 @@ export default function ReportItemScreen() {
   const [isLocating, setIsLocating] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
+  
+  const [isMapVisible, setIsMapVisible] = useState(false);
+  const [tempCoordinate, setTempCoordinate] = useState(null);
+  const [mapType, setMapType] = useState("standard"); // Toggle satellite/standard
+
+  const DEFAULT_REGION = {
+    latitude: 23.2230998,
+    longitude: 72.5054761,
+    latitudeDelta: 0.005,
+    longitudeDelta: 0.005,
+  };
 
   // 1. Camera Capture Handler
   const handleTakePhoto = async () => {
@@ -159,6 +172,45 @@ export default function ReportItemScreen() {
     } finally {
       setIsLocating(false);
     }
+  };
+
+  const handleConfirmMapLocation = async () => {
+    if (!tempCoordinate) return;
+    
+    setCoordinates(tempCoordinate);
+    setIsMapVisible(false);
+    setIsLocating(true);
+    
+    try {
+      const geocode = await Location.reverseGeocodeAsync({ 
+        latitude: tempCoordinate.latitude, 
+        longitude: tempCoordinate.longitude 
+      });
+      
+      if (geocode && geocode.length > 0) {
+        const place = geocode[0];
+        const readableAddress = [
+          place.name || place.street,
+          place.district || place.subregion,
+          place.city,
+        ]
+          .filter(Boolean)
+          .join(", ");
+
+        setLocationName(readableAddress || `Near coordinates (${tempCoordinate.latitude.toFixed(3)}, ${tempCoordinate.longitude.toFixed(3)})`);
+      } else {
+        setLocationName(`Near coordinates (${tempCoordinate.latitude.toFixed(3)}, ${tempCoordinate.longitude.toFixed(3)})`);
+      }
+    } catch (error) {
+      console.error("Reverse Geocode Error:", error);
+      setLocationName(`Near coordinates (${tempCoordinate.latitude.toFixed(3)}, ${tempCoordinate.longitude.toFixed(3)})`);
+    } finally {
+      setIsLocating(false);
+    }
+  };
+
+  const toggleMapType = () => {
+    setMapType((prev) => (prev === "standard" ? "satellite" : "standard"));
   };
 
   // 4. Form Submission Handler (Multipart/FormData)
@@ -418,21 +470,33 @@ export default function ReportItemScreen() {
             <View style={styles.inputGroup}>
               <View style={styles.locationHeaderRow}>
                 <Text style={styles.inputLabel}>Location *</Text>
-                <TouchableOpacity
-                  style={styles.gpsButton}
-                  onPress={handleGetLocation}
-                  disabled={isLocating}
-                  activeOpacity={0.7}
-                >
-                  {isLocating ? (
-                    <ActivityIndicator size="small" color={COLORS.primary} />
-                  ) : (
-                    <>
-                      <Ionicons name="navigate" size={14} color={COLORS.primary} />
-                      <Text style={styles.gpsButtonText}>Use GPS</Text>
-                    </>
-                  )}
-                </TouchableOpacity>
+                <View style={{ flexDirection: 'row', gap: 8 }}>
+                  <TouchableOpacity
+                    style={styles.gpsButton}
+                    onPress={handleGetLocation}
+                    disabled={isLocating}
+                    activeOpacity={0.7}
+                  >
+                    {isLocating ? (
+                      <ActivityIndicator size="small" color={COLORS.primary} />
+                    ) : (
+                      <>
+                        <Ionicons name="navigate" size={14} color={COLORS.primary} />
+                        <Text style={styles.gpsButtonText}>Use GPS</Text>
+                      </>
+                    )}
+                  </TouchableOpacity>
+
+                  <TouchableOpacity
+                    style={styles.gpsButton}
+                    onPress={() => setIsMapVisible(true)}
+                    disabled={isLocating}
+                    activeOpacity={0.7}
+                  >
+                    <Ionicons name="map" size={14} color={COLORS.primary} />
+                    <Text style={styles.gpsButtonText}>Pin Map</Text>
+                  </TouchableOpacity>
+                </View>
               </View>
               <TextInput
                 style={styles.input}
@@ -468,6 +532,59 @@ export default function ReportItemScreen() {
           </View>
         </ScrollView>
       </KeyboardAvoidingView>
+
+      {/* Map Picker Modal */}
+      <Modal visible={isMapVisible} animationType="slide" transparent={false}>
+        <View style={styles.mapContainer}>
+          <View style={styles.mapHeader}>
+            <Text style={styles.mapHeaderText}>Tap to Pin Location</Text>
+            <View style={{ flexDirection: "row", alignItems: "center", gap: 16 }}>
+              <TouchableOpacity onPress={toggleMapType}>
+                <Ionicons 
+                  name={mapType === "standard" ? "earth" : "map"} 
+                  size={24} 
+                  color={COLORS.primary} 
+                />
+              </TouchableOpacity>
+              <TouchableOpacity onPress={() => setIsMapVisible(false)}>
+                <Ionicons name="close" size={28} color={COLORS.textPrimary} />
+              </TouchableOpacity>
+            </View>
+          </View>
+          <MapView
+            style={styles.map}
+            initialRegion={{
+              latitude: coordinates.latitude || DEFAULT_REGION.latitude,
+              longitude: coordinates.longitude || DEFAULT_REGION.longitude,
+              latitudeDelta: DEFAULT_REGION.latitudeDelta,
+              longitudeDelta: DEFAULT_REGION.longitudeDelta,
+            }}
+            mapType={mapType}
+            minZoomLevel={15.5}
+            onPress={(e) => setTempCoordinate(e.nativeEvent.coordinate)}
+          >
+            {tempCoordinate && (
+              <Marker coordinate={tempCoordinate} title="Selected Location" />
+            )}
+            {!tempCoordinate && coordinates.latitude && (
+              <Marker coordinate={coordinates} title="Current Location" pinColor="blue" />
+            )}
+          </MapView>
+          <View style={styles.mapFooter}>
+            <TouchableOpacity
+              style={[
+                styles.submitButton,
+                !tempCoordinate && styles.buttonDisabled,
+                { backgroundColor: COLORS.primary }
+              ]}
+              disabled={!tempCoordinate}
+              onPress={handleConfirmMapLocation}
+            >
+              <Text style={styles.submitButtonText}>Confirm Location</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </Modal>
     </View>
   );
 }
@@ -703,5 +820,34 @@ const styles = StyleSheet.create({
     color: "#FFFFFF",
     fontSize: 16,
     fontWeight: "700",
+  },
+  mapContainer: {
+    flex: 1,
+    backgroundColor: COLORS.background,
+  },
+  mapHeader: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    paddingHorizontal: 20,
+    paddingTop: 50,
+    paddingBottom: 15,
+    backgroundColor: COLORS.card,
+    borderBottomWidth: 1,
+    borderBottomColor: COLORS.border,
+  },
+  mapHeaderText: {
+    fontSize: 18,
+    fontWeight: "700",
+    color: COLORS.textPrimary,
+  },
+  map: {
+    flex: 1,
+  },
+  mapFooter: {
+    padding: 20,
+    backgroundColor: COLORS.card,
+    borderTopWidth: 1,
+    borderTopColor: COLORS.border,
   },
 });
