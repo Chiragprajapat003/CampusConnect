@@ -16,6 +16,8 @@ import {
 import { useRouter } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { LinearGradient } from "expo-linear-gradient";
+import * as Animatable from "react-native-animatable";
 import { useAuth } from "../../context/AuthContext";
 import { COLORS } from "../../lib/config";
 
@@ -50,7 +52,10 @@ export default function LoginScreen() {
   };
 
   return (
-    <View style={[styles.safeArea, { paddingTop: insets.top, paddingBottom: insets.bottom }]}>
+    <LinearGradient
+      colors={["#8B5CF6", "#EC4899", "#F43F5E"]}
+      style={[styles.safeArea, { paddingTop: insets.top, paddingBottom: insets.bottom }]}
+    >
       <KeyboardAvoidingView
         behavior={Platform.OS === "ios" ? "padding" : "height"}
         style={styles.container}
@@ -69,16 +74,16 @@ export default function LoginScreen() {
             </View>
 
             {/* Header Text */}
-            <View style={styles.header}>
+            <Animatable.View animation="fadeInDown" duration={1000} style={styles.header}>
               <Text style={styles.brandTitle}>Find What's Lost.</Text>
               <Text style={styles.brandTitleAccent}>Discover What's On.</Text>
               <Text style={styles.tagline}>
                 Your campus hub for buzzing pop-ups, stolen jackets, and daily student quests.
               </Text>
-            </View>
+            </Animatable.View>
 
             {/* Login Card Form */}
-            <View style={styles.card}>
+            <Animatable.View animation="fadeInUp" duration={1200} style={styles.card}>
               <Text style={styles.cardTitle}>Welcome Back</Text>
               <Text style={styles.cardSubtitle}>
                 Sign in with your verified college email
@@ -160,7 +165,7 @@ export default function LoginScreen() {
                   </View>
                 )}
               </TouchableOpacity>
-            </View>
+            </Animatable.View>
 
             {/* Footer */}
             <View style={styles.footer}>
@@ -172,14 +177,13 @@ export default function LoginScreen() {
           </ScrollView>
         </TouchableWithoutFeedback>
       </KeyboardAvoidingView>
-    </View>
+    </LinearGradient>
   );
 }
 
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
-    backgroundColor: "#F0F5FF", // Light blue to mimic the top of the gradient
   },
   container: {
     flex: 1,
@@ -195,59 +199,61 @@ const styles = StyleSheet.create({
     marginBottom: 40,
   },
   topBadge: {
-    backgroundColor: "rgba(255,255,255,0.7)",
+    backgroundColor: "rgba(255,255,255,0.2)",
     paddingHorizontal: 16,
     paddingVertical: 6,
     borderRadius: 20,
     borderWidth: 1,
-    borderColor: "rgba(0,0,0,0.05)",
+    borderColor: "rgba(255,255,255,0.4)",
   },
   topBadgeText: {
     fontSize: 10,
     fontWeight: "800",
     letterSpacing: 1,
-    color: "#4F46E5",
+    color: "#FFFFFF",
   },
   header: {
     alignItems: "center",
     marginBottom: 40,
   },
   brandTitle: {
-    fontSize: 32,
-    fontWeight: "800",
-    color: "#0F172A",
+    fontSize: 34,
+    fontWeight: "900",
+    color: "#FFFFFF",
     letterSpacing: -1,
     textAlign: "center",
   },
   brandTitleAccent: {
-    fontSize: 32,
-    fontWeight: "800",
-    color: "#F43F5E", // Vibrant pink/red
+    fontSize: 34,
+    fontWeight: "900",
+    color: "#FFE4E6",
     letterSpacing: -1,
     textAlign: "center",
   },
   tagline: {
-    fontSize: 15,
-    color: "#64748B",
+    fontSize: 16,
+    color: "rgba(255,255,255,0.9)",
     textAlign: "center",
     marginTop: 12,
     lineHeight: 22,
     paddingHorizontal: 10,
   },
   card: {
-    backgroundColor: "#FFFFFF",
-    borderRadius: 32, // More rounded like the screenshot
+    backgroundColor: "rgba(255, 255, 255, 0.95)",
+    borderRadius: 32,
     padding: 24,
-    shadowColor: "#4F46E5",
-    shadowOffset: { width: 0, height: 12 },
-    shadowOpacity: 0.08,
-    shadowRadius: 24,
-    elevation: 8,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 20 },
+    shadowOpacity: 0.15,
+    shadowRadius: 30,
+    elevation: 10,
+    borderWidth: 1,
+    borderColor: "rgba(255,255,255,0.5)",
   },
   cardTitle: {
-    fontSize: 22,
-    fontWeight: "800",
-    color: "#0F172A",
+    fontSize: 24,
+    fontWeight: "900",
+    color: COLORS.textPrimary,
     textAlign: "center",
   },
   cardSubtitle: {
@@ -296,15 +302,15 @@ const styles = StyleSheet.create({
     padding: 8,
   },
   primaryButton: {
-    backgroundColor: "#0B1426", // Dark navy almost black
+    backgroundColor: COLORS.primary,
     height: 56,
     borderRadius: 100, // Pill shape
     justifyContent: "center",
     alignItems: "center",
     marginTop: 12,
-    shadowColor: "#0B1426",
+    shadowColor: COLORS.primary,
     shadowOffset: { width: 0, height: 8 },
-    shadowOpacity: 0.2,
+    shadowOpacity: 0.3,
     shadowRadius: 12,
     elevation: 4,
   },
@@ -329,12 +335,12 @@ const styles = StyleSheet.create({
   },
   footerText: {
     fontSize: 14,
-    color: "#64748B",
+    color: "rgba(255,255,255,0.8)",
   },
   footerLink: {
-    fontSize: 14,
+    fontSize: 15,
     fontWeight: "800",
-    color: "#4F46E5",
+    color: "#FFFFFF",
   },
 });
 

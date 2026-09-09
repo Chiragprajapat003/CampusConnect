@@ -18,6 +18,8 @@ import { useRouter } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import * as ImagePicker from "expo-image-picker";
+import * as Animatable from "react-native-animatable";
+import { LinearGradient } from "expo-linear-gradient";
 import { useAuth } from "../../context/AuthContext";
 import { useTheme } from "../../context/ThemeContext";
 import { COLORS } from "../../lib/config";
@@ -99,7 +101,7 @@ export default function RegisterScreen() {
           text: "Choose from Gallery",
           onPress: async () => {
             const result = await ImagePicker.launchImageLibraryAsync({
-              mediaTypes: ImagePicker.MediaTypeOptions.Images,
+              mediaTypes: ['images'],
               allowsEditing: true,
               aspect: [1, 1],
               quality: 0.8,
@@ -192,7 +194,10 @@ export default function RegisterScreen() {
   };
 
   return (
-    <View style={[styles.safeArea, { backgroundColor: colors.background, paddingTop: insets.top, paddingBottom: insets.bottom }]}>
+    <LinearGradient
+      colors={["#8B5CF6", "#EC4899", "#F43F5E"]}
+      style={[styles.safeArea, { paddingTop: insets.top, paddingBottom: insets.bottom }]}
+    >
       <KeyboardAvoidingView
         behavior={Platform.OS === "ios" ? "padding" : "height"}
         style={styles.container}
@@ -220,16 +225,16 @@ export default function RegisterScreen() {
             </TouchableOpacity>
 
             {/* Header */}
-            <View style={styles.header}>
-              <Text style={[styles.headerTitle, { color: colors.textPrimary }]}>
+            <Animatable.View animation="fadeInDown" duration={800} style={styles.header}>
+              <Text style={styles.headerTitle}>
                 {currentStep === 1 ? "Create Account" : "Verify Email ✉️"}
               </Text>
-              <Text style={[styles.headerSubtitle, { color: colors.textSecondary }]}>
+              <Text style={styles.headerSubtitle}>
                 {currentStep === 1
                   ? "Join your verified campus network"
                   : `Enter the 6-digit code sent to ${email}`}
               </Text>
-            </View>
+            </Animatable.View>
 
             {/* Error Banner */}
             {errorMessage ? (
@@ -241,7 +246,7 @@ export default function RegisterScreen() {
 
             {/* ─── STEP 1: REGISTRATION FORM ─── */}
             {currentStep === 1 ? (
-              <View style={[styles.card, { backgroundColor: colors.card, borderColor: colors.border }]}>
+              <Animatable.View animation="fadeInUp" duration={1000} style={[styles.card, { backgroundColor: "rgba(255,255,255,0.95)" }]}>
                 {/* Profile Photo Avatar Picker */}
                 <View style={styles.avatarPickerSection}>
                   <TouchableOpacity
@@ -383,10 +388,10 @@ export default function RegisterScreen() {
                     </View>
                   )}
                 </TouchableOpacity>
-              </View>
+              </Animatable.View>
             ) : (
               /* ─── STEP 2: 6-DIGIT OTP VERIFICATION CARD ─── */
-              <View style={[styles.card, { backgroundColor: colors.card, borderColor: colors.border }]}>
+              <Animatable.View animation="fadeInUp" duration={800} style={[styles.card, { backgroundColor: "rgba(255,255,255,0.95)" }]}>
                 <View style={[styles.otpIconCircle, { backgroundColor: colors.primaryLight }]}>
                   <Ionicons name="shield-checkmark" size={32} color={colors.primary} />
                 </View>
@@ -457,7 +462,7 @@ export default function RegisterScreen() {
                     Edit Details / Change Email
                   </Text>
                 </TouchableOpacity>
-              </View>
+              </Animatable.View>
             )}
 
             {/* Switch to Login */}
@@ -470,7 +475,7 @@ export default function RegisterScreen() {
           </ScrollView>
         </TouchableWithoutFeedback>
       </KeyboardAvoidingView>
-    </View>
+    </LinearGradient>
   );
 }
 
@@ -500,13 +505,15 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
   headerTitle: {
-    fontSize: 28,
-    fontWeight: "800",
+    fontSize: 32,
+    fontWeight: "900",
     letterSpacing: -0.5,
+    color: "#FFFFFF",
   },
   headerSubtitle: {
-    fontSize: 14,
-    marginTop: 4,
+    fontSize: 16,
+    marginTop: 6,
+    color: "rgba(255,255,255,0.9)",
   },
   card: {
     borderRadius: 24,
@@ -724,9 +731,11 @@ const styles = StyleSheet.create({
   },
   footerText: {
     fontSize: 14,
+    color: "rgba(255,255,255,0.8)",
   },
   footerLink: {
-    fontSize: 14,
-    fontWeight: "700",
+    fontSize: 15,
+    fontWeight: "800",
+    color: "#FFFFFF",
   },
 });
